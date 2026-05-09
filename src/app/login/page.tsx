@@ -169,16 +169,12 @@ export default function LoginPage() {
           </h1>
           <p className="text-blue-100 text-lg max-w-md">
             Kelola kehadiran karyawan dengan mudah, akurat, dan aman. Dilengkapi
-            validasi kamera, GPS, dan radius kantor.
+            validasi kamera dan laporan lengkap.
           </p>
-          <div className="grid grid-cols-3 gap-4 pt-6 max-w-md">
+          <div className="grid grid-cols-2 gap-4 pt-6 max-w-xs">
             <div>
               <div className="text-3xl font-bold">📸</div>
               <div className="text-sm text-blue-100">Foto Selfie</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold">📍</div>
-              <div className="text-sm text-blue-100">GPS Tracking</div>
             </div>
             <div>
               <div className="text-3xl font-bold">📊</div>
@@ -192,19 +188,36 @@ export default function LoginPage() {
       </div>
 
       {/* Right form panel */}
-      <div className="relative flex items-center justify-center min-h-screen lg:min-h-0 p-6 sm:p-12">
-        {/* Mobile background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 lg:hidden" />
-        <div className="absolute inset-0 opacity-10 lg:hidden">
+      <div className="relative flex flex-col items-center justify-center min-h-screen lg:min-h-0 p-6 sm:p-12 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 lg:bg-none lg:bg-background">
+        {/* Decorative blobs — visible on all sizes */}
+        <div className="absolute inset-0 opacity-10 lg:hidden pointer-events-none">
           <div className="absolute top-10 left-10 h-72 w-72 rounded-full bg-white blur-3xl" />
           <div className="absolute bottom-10 right-10 h-96 w-96 rounded-full bg-white blur-3xl" />
         </div>
 
+        {/* Mobile brand header */}
+        <div className="relative lg:hidden mb-8 text-center text-white space-y-3">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur">
+            <Fingerprint className="h-8 w-8" />
+          </div>
+          <div className="text-2xl font-bold tracking-tight">AbsensiKu</div>
+          <p className="text-blue-100 text-sm max-w-xs mx-auto">
+            Sistem Absensi Karyawan Modern
+          </p>
+          <div className="flex justify-center gap-6 pt-1">
+            <div className="text-center">
+              <div className="text-2xl">📸</div>
+              <div className="text-xs text-blue-100">Foto Selfie</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl">📊</div>
+              <div className="text-xs text-blue-100">Laporan</div>
+            </div>
+          </div>
+        </div>
+
         <Card className="relative w-full max-w-md border-0 shadow-xl lg:shadow-sm">
           <CardHeader className="space-y-2 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground lg:hidden">
-              <Fingerprint className="h-7 w-7" />
-            </div>
             <CardTitle className="text-2xl">Selamat Datang</CardTitle>
             <CardDescription>
               Masuk ke akun Anda untuk melanjutkan
@@ -222,6 +235,10 @@ export default function LoginPage() {
             </Suspense>
           </CardContent>
         </Card>
+
+        <p className="relative lg:hidden mt-6 text-xs text-blue-100">
+          &copy; {new Date().getFullYear()} AbsensiKu. All rights reserved.
+        </p>
       </div>
     </div>
   );
