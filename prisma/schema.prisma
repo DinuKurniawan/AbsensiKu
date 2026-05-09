@@ -1,0 +1,145 @@
+// AbsensiKu - Prisma Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum AttendanceStatus {
+  HADIR
+  TERLAMBAT
+  IZIN
+  SAKIT
+  CUTI
+  ALPA
+}
+
+enum LeaveType {
+  IZIN
+  SAKIT
+  CUTI
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  password      String
+  role          Role     @default(EMPLOYEE)
+  phone         String?
+  position      String?
+  department    String?
+  employeeCode  String?  @unique @map("employee_code")
+  photo         String?
+  address       String?
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  attendances         Attendance[]
+  leaveRequests       LeaveRequest[]  @relation("UserLeaveRequests")
+  approvedLeaves      LeaveRequest[]  @relation("ApprovedBy")
+  activityLogs        ActivityLog[]
+
+  @@map("users")
+}
+
+model Attendance {
+  id                  String            @id @default(cuid())
+  userId              String            @map("user_id")
+  date                DateTime          @db.Date
+  checkInTime         DateTime?         @map("check_in_time")
+  checkOutTime        DateTime?         @map("check_out_time")
+  checkInPhoto        String?           @map("check_in_photo")
+  checkOutPhoto       String?           @map("check_out_photo")
+  checkInLatitude     Float?            @map("check_in_latitude")
+  checkInLongitude    Float?            @map("check_in_longitude")
+  checkOutLatitude    Float?            @map("check_out_latitude")
+  checkOutLongitude   Float?            @map("check_out_longitude")
+  checkInDistance     Float?            @map("check_in_distance")
+  checkOutDistance    Float?            @map("check_out_distance")
+  status              AttendanceStatus  @default(HADIR)
+  note                String?
+  deviceInfo          String?           @map("device_info")
+  ipAddress           String?           @map("ip_address")
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+  @@index([status])
+  @@map("attendances")
+}
+
+model LeaveRequest {
+  id              String       @id @default(cuid())
+  userId          String       @map("user_id")
+  type            LeaveType
+  startDate       DateTime     @map("start_date") @db.Date
+  endDate         DateTime     @map("end_date") @db.Date
+  reason          String
+  attachment      String?
+  status          LeaveStatus  @default(PENDING)
+  approvedBy      String?      @map("approved_by")
+  approvedAt      DateTime?    @map("approved_at")
+  rejectedReason  String?      @map("rejected_reason")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  user     User  @relation("UserLeaveRequests", fields: [userId], references: [id], onDelete: Cascade)
+  approver User? @relation("ApprovedBy", fields: [approvedBy], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("leave_requests")
+}
+
+model OfficeSetting {
+  id              String   @id @default(cuid())
+  officeName      String   @map("office_name")
+  officeLatitude  Float    @map("office_latitude")
+  officeLongitude Float    @map("office_longitude")
+  radiusMeter     Int      @map("radius_meter")
+  checkInStart    String   @map("check_in_start")
+  checkInEnd      String   @map("check_in_end")
+  checkOutStart   String   @map("check_out_start")
+  checkOutEnd     String   @map("check_out_end")
+  timezone        String   @default("Asia/Jakarta")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("office_settings")
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String?  @map("user_id")
+  action      String
+  description String?
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@map("activity_logs")
+}
